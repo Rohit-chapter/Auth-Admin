@@ -2,8 +2,6 @@ const User = require('../../models/user');
 
 const { isValueExists } = require('../../utilities/collections');
 
-const authUtilities = require('./utilities');
-
 exports.addUser = async (request, response, next) => {
 
   try {
@@ -40,40 +38,6 @@ exports.addUser = async (request, response, next) => {
 
     return response.status(400).json({ error: exception });
 
-  }
-
-};
-
-exports.getLinkedinProfile = async (request, response, next) => {
-
-  try {
-
-    let user = {};
-
-    const code = request.query.code;
-
-    const accessToken = await authUtilities.getLinkedinAccessTokenByCode(code);
-
-    const userProfile = await authUtilities.getLinkedinProfileByToken(accessToken);
-
-    const userEmail = await authUtilities.getLinkedinUserEmailByToken(accessToken);
-
-    user = {
-      ...userProfile,
-      profileImage: null,
-      email: userEmail.emailAddress
-    };
-
-    let resStatus = 400;
-
-    if (!(accessToken === null || userProfile === null || userEmail === null)) {
-      resStatus = 200;
-    }
-
-    response.status(resStatus).json({ user });
-
-  } catch (exception) {
-    response.status(400).json({ error: exception });
   }
 
 };

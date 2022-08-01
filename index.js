@@ -8,6 +8,8 @@ const mongoConnect = require('./utilities/database').mongoConnect;
 
 const authRoutes = require('./routes/auth');
 
+const serverPort = process.env.SERVER_PORT;
+
 const app = express();
 
 app.use(cors());
@@ -20,8 +22,8 @@ app.use(bodyParser.json())
 app.use(authRoutes);
 
 mongoConnect(() => {
-  app.listen(8000);
+  app.listen(serverPort);
 });
 
 // eslint-disable-next-line no-console
-console.log('Server is running on port: 8000');
+console.log(`Server is running on port: ${serverPort}`);

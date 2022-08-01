@@ -4,12 +4,13 @@ const mongodb = require('mongodb');
 
 const MongoClient = mongodb.MongoClient;
 
+const mongodbConnectionString = process.env.MONGODB_CONNECTION_URL;
+
 let db;
 
 const mongoConnect = (callback) => {
-  MongoClient.connect(
-    'mongodb://localhost:27017/sample-database'
-  )
+
+  MongoClient.connect(mongodbConnectionString)
     .then((client) => {
       console.log('Connected');
       db = client.db();
@@ -19,6 +20,7 @@ const mongoConnect = (callback) => {
       console.log(error);
       throw error;
     });
+
 };
 
 const getDB = () => {

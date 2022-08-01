@@ -1,5 +1,3 @@
-const mongodb = require('mongodb');
-
 const User = require('../../models/user');
 
 const { isValueExists } = require('../../utilities/collections');
@@ -24,11 +22,9 @@ exports.addUser = async (request, response, next) => {
 
     if (userAlreadyExists === true) {
 
-      return response.status(200).json({
-        status: 'error',
-        statuscode: 400,
+      return response.status(409).json({
         error: {
-          message: 'User with this email already exists'
+          message: 'User with this email already exists. Please login.'
         }
       });
 
@@ -38,21 +34,11 @@ exports.addUser = async (request, response, next) => {
 
     const userProfile = await User.findById(userId);
 
-    return response.status(200).json({
-      status: 'success',
-      statuscode: 200,
-      data: {
-        user: userProfile
-      }
-    });
+    return response.status(200).json({ user: userProfile });
 
   } catch (exception) {
 
-    return response.status(400).json({
-      status: 'error',
-      statuscode: 400,
-      error: exception
-    });
+    return response.status(400).json({ error: exception });
 
   }
 
@@ -87,7 +73,7 @@ exports.getLinkedinProfile = async (request, response, next) => {
     response.status(resStatus).json({ user });
 
   } catch (exception) {
-    console.log(exception);
+    response.status(400).json({ error: exception });
   }
 
 };

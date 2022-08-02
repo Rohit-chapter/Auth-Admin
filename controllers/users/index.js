@@ -12,7 +12,8 @@ exports.addUser = async (request, response, next) => {
     const lastName = body.lastName;
     const email = body.email;
     const password = body.password;
-    const user = new User(firstName, lastName, email, password,);
+    const authenticationType = body.authenticationType;
+    const user = new User(firstName, lastName, email, password, authenticationType, null);
 
     const users = await User.fetchAll();
 
@@ -20,7 +21,7 @@ exports.addUser = async (request, response, next) => {
 
     if (userAlreadyExists === true) {
 
-      return response.status(409).json({
+      return response.status(400).json({
         error: {
           message: 'User with this email already exists. Please login.'
         }
@@ -36,7 +37,7 @@ exports.addUser = async (request, response, next) => {
 
   } catch (exception) {
 
-    return response.status(400).json({ error: exception });
+    return response.status(500).json({ error: exception });
 
   }
 

@@ -4,11 +4,12 @@ const { getDB } = require('../utilities/database');
 
 class User {
 
-  constructor(firstName, lastName, email, password, id) {
+  constructor(firstName, lastName, email, password, authenticationType, id) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.password = password;
+    this.authenticationType = authenticationType;
     this._id = id ? mongodb.ObjectId(id) : null;
   }
 

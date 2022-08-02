@@ -16,7 +16,6 @@ exports.getLinkedinProfile = async (request, response, next) => {
 
     user = {
       ...userProfile,
-      profileImage: null,
       email: userEmail.emailAddress
     };
 

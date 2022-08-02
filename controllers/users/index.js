@@ -42,3 +42,38 @@ exports.addUser = async (request, response, next) => {
   }
 
 };
+
+exports.loginUser = async (request, response, next) => {
+
+  try {
+
+    const body = request.body;
+
+    const email = body.email;
+    const password = body.password;
+
+    const user = await User.findByEmail(email);
+
+    if (user === null) {
+      return response.status(400).json({
+        error: {
+          message: 'User with this email not found. Please register.'
+        }
+      });
+    }
+
+    if (user.password !== password) {
+      return response.status(400).json({
+        error: {
+          message: 'Password mismatch'
+        }
+      });
+    }
+
+    return response.status(200).json({ user });
+
+  } catch (exception) {
+    return response.status(500).json({ error: exception });
+  }
+
+};

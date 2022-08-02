@@ -9,4 +9,6 @@ router.get('/getLinkedinProfile', authController.getLinkedinProfile);
 
 router.post('/registration', usersController.addUser);
 
+router.post('/login', usersController.loginUser);
+
 module.exports = router;

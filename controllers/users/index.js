@@ -1,6 +1,7 @@
 const User = require('../../models/user');
 
 const { isValueExists } = require('../../utilities/collections');
+const { generateAccessToken } = require('../../utilities/jwt-tokens');
 
 exports.addUser = async (request, response, next) => {
 
@@ -33,7 +34,14 @@ exports.addUser = async (request, response, next) => {
 
     const userProfile = await User.findById(userId);
 
-    return response.status(200).json({ user: userProfile });
+    const accessToken = generateAccessToken({ userId: userProfile._id.toString() });
+
+    const data = {
+      user: userProfile,
+      accessToken
+    };
+
+    return response.status(200).json(data);
 
   } catch (exception) {
 
@@ -70,10 +78,19 @@ exports.loginUser = async (request, response, next) => {
       });
     }
 
-    return response.status(200).json({ user });
+    const accessToken = generateAccessToken({ userId: user._id.toString() });
+
+    const data = {
+      user,
+      accessToken
+    };
+
+    return response.status(200).json(data);
 
   } catch (exception) {
+
     return response.status(500).json({ error: exception });
+
   }
 
 };

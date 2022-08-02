@@ -77,3 +77,17 @@ exports.loginUser = async (request, response, next) => {
   }
 
 };
+
+exports.getAllUsers = async (request, response, next) => {
+
+  try {
+
+    const users = await User.fetchAll();
+
+    return response.status(200).json({ users });
+
+  } catch (exception) {
+    return response.status(500).json({ error: exception });
+  }
+
+};

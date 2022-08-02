@@ -7,6 +7,9 @@ const bodyParser = require('body-parser');
 const mongoConnect = require('./utilities/database').mongoConnect;
 
 const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
+
+const errorController = require('./controllers/errors');
 
 const serverPort = process.env.SERVER_PORT;
 
@@ -20,6 +23,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
 app.use(authRoutes);
+app.use(userRoutes);
+
+app.use(errorController.handleNotFoundRoutes);
 
 mongoConnect(() => {
   app.listen(serverPort);

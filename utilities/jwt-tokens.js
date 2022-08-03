@@ -3,12 +3,17 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+const tokenExpirationDuration = '5m';
 
 exports.generateAccessToken = (user) => {
 
-  const accessToken = jwt.sign(user, accessTokenSecret, { expiresIn: '2m' });
+  const accessToken = jwt.sign(user, accessTokenSecret, { expiresIn: tokenExpirationDuration });
 
-  return accessToken;
+  return {
+    token: accessToken,
+    issuedAt: new Date().getTime(),
+    expiresIn: 1000 * 60 * 5
+  };
 
 };
 
@@ -63,9 +68,9 @@ async function checkTokenExistsInDocument(userId, token) {
 
   const userProfile = await User.findById(userId);
 
-  for (let _token of userProfile.accessTokens) {
+  for (let accessToken of userProfile.accessTokens) {
 
-    if (_token === token) {
+    if (accessToken.token === token) {
       tokenExists = true;
       break;
     }

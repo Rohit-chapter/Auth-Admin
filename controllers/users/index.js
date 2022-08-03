@@ -138,8 +138,8 @@ exports.logoutUser = async (request, response, next) => {
 
     const user = await User.findById(tokenData.userId);
 
-    const accessTokens = user.accessTokens.filter((token) => {
-      return token !== tokenData.token;
+    const accessTokens = user.accessTokens.filter((accessToken) => {
+      return accessToken.token !== tokenData.token;
     });
 
     const updatedUser = {

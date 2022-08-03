@@ -48,6 +48,7 @@ exports.validateToken = (request, response, next) => {
       });
     }
 
+    tokenData.token = token;
     request.tokenData = tokenData;
 
     next();

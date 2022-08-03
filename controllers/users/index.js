@@ -129,3 +129,31 @@ exports.getAllUsers = async (request, response, next) => {
   }
 
 };
+
+exports.logoutUser = async (request, response, next) => {
+
+  try {
+
+    const tokenData = request.tokenData;
+
+    const user = await User.findById(tokenData.userId);
+
+    const accessTokens = user.accessTokens.filter((token) => {
+      return token !== tokenData.token;
+    });
+
+    const updatedUser = {
+      ...user,
+      accessTokens
+    };
+
+    await User.updateUser(updatedUser);
+
+    return response.status(200).json({
+      message: 'Successfully logout!'
+    })
+
+  } catch (exception) {
+    return response.status(500).json({ error: exception });
+  }
+};

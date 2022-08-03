@@ -14,7 +14,7 @@ exports.addUser = async (request, response, next) => {
     const email = body.email;
     const password = body.password;
     const authenticationType = body.authenticationType;
-    const user = new User(firstName, lastName, email, password, authenticationType, null);
+    const user = new User(firstName, lastName, email, password, authenticationType, null, []);
 
     const users = await User.fetchAll();
 
@@ -36,6 +36,8 @@ exports.addUser = async (request, response, next) => {
 
     const accessToken = generateAccessToken({ userId: userProfile._id.toString() });
 
+    await storeTokenRecordsInDocument(userProfile, accessToken);
+
     const data = {
       user: userProfile,
       accessToken
@@ -44,6 +46,8 @@ exports.addUser = async (request, response, next) => {
     return response.status(200).json(data);
 
   } catch (exception) {
+
+    console.log(exception);
 
     return response.status(500).json({ error: exception });
 
@@ -80,6 +84,8 @@ exports.loginUser = async (request, response, next) => {
 
     const accessToken = generateAccessToken({ userId: user._id.toString() });
 
+    await storeTokenRecordsInDocument(user, accessToken);
+
     const data = {
       user,
       accessToken
@@ -94,6 +100,21 @@ exports.loginUser = async (request, response, next) => {
   }
 
 };
+
+async function storeTokenRecordsInDocument(userProfile, accessToken) {
+
+  const accessTokens = userProfile.accessTokens;
+
+  accessTokens.push(accessToken);
+
+  const updatedUser = {
+    ...userProfile,
+    accessTokens
+  };
+
+  await User.updateUser(updatedUser);
+
+}
 
 exports.getAllUsers = async (request, response, next) => {
 

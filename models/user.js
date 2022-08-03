@@ -4,13 +4,14 @@ const { getDB } = require('../utilities/database');
 
 class User {
 
-  constructor(firstName, lastName, email, password, authenticationType, id) {
+  constructor(firstName, lastName, email, password, authenticationType, id, accessTokens) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
     this.password = password;
     this.authenticationType = authenticationType;
     this._id = id ? mongodb.ObjectId(id) : null;
+    this.accessTokens = accessTokens;
   }
 
   save() {
@@ -33,7 +34,7 @@ class User {
     const objectId = new mongodb.ObjectId(id);
 
     return db.collection('users')
-      .find({ _id: objectId })
+      .find({ _id: objectId }, { password: 0, accessTokens: 0 })
       .next()
       .then((user) => {
         return user;
@@ -46,7 +47,7 @@ class User {
     const db = getDB();
 
     return db.collection('users')
-      .find()
+      .find({}, { password: 0, accessTokens: 0 })
       .toArray()
       .then((users) => {
         return users;
@@ -64,6 +65,17 @@ class User {
       .then((user) => {
         return user;
       })
+      .catch((error) => console.log(error));
+
+  }
+
+  static updateUser(user) {
+
+    const db = getDB();
+
+    return db.collection('users')
+      .updateOne({ _id: user._id }, { $set: user })
+      .then()
       .catch((error) => console.log(error));
 
   }

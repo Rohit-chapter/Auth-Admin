@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-const tokenExpirationDuration = '5m';
+const tokenExpirationDuration = '1h';
 
 exports.generateAccessToken = (user) => {
 
@@ -11,8 +11,7 @@ exports.generateAccessToken = (user) => {
 
   return {
     token: accessToken,
-    issuedAt: new Date().getTime(),
-    expiresIn: 1000 * 60 * 5
+    expiresAt: calculateExpiresAt()
   };
 
 };
@@ -62,7 +61,18 @@ exports.validateToken = (request, response, next) => {
 
 };
 
-async function checkTokenExistsInDocument(userId, token) {
+const calculateExpiresAt = () => {
+
+  const currentTime = new Date().getTime();
+  const expiresIn = 1000 * 60 * 60;
+
+  const expiresAt = currentTime + expiresIn;
+
+  return expiresAt;
+
+};
+
+const checkTokenExistsInDocument = async (userId, token) => {
 
   let tokenExists = false;
 
@@ -79,7 +89,7 @@ async function checkTokenExistsInDocument(userId, token) {
 
   return tokenExists;
 
-}
+};
 
 // async function removeExpiredTokensFromDocument(userId) {
 

@@ -157,3 +157,17 @@ exports.logoutUser = async (request, response, next) => {
     return response.status(500).json({ error: exception });
   }
 };
+
+exports.getMyProfile = async (request, response, next) => {
+
+  try {
+    const userId = request.tokenData.userId;
+
+    const user = await User.findById(userId);
+
+    return response.status(200).json({ profile: user });
+
+  } catch (exception) {
+    return response.status(500).json({ error: exception });
+  }
+};

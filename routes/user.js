@@ -9,4 +9,6 @@ router.get('/getUsers', validateToken, usersController.getAllUsers);
 
 router.get('/getMyProfile', validateToken, usersController.getMyProfile);
 
+router.post('/deleteUser', validateToken, usersController.deleteUser);
+
 module.exports = router;

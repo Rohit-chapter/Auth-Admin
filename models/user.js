@@ -80,6 +80,19 @@ class User {
 
   }
 
+  static deleteById(id) {
+
+    const db = getDB();
+
+    const objectId = new mongodb.ObjectId(id);
+
+    return db.collection('users')
+      .deleteOne({ _id: objectId })
+      .then()
+      .catch((error) => console.log(error));
+
+  }
+
 }
 
 module.exports = User;

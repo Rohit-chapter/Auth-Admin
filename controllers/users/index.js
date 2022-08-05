@@ -3,6 +3,8 @@ const User = require('../../models/user');
 const { isValueExists } = require('../../utilities/collections');
 const { generateAccessToken } = require('../../utilities/jwt-tokens');
 
+const { storeTokenRecordsInDocument } = require('./utilities');
+
 exports.addUser = async (request, response, next) => {
 
   try {
@@ -101,28 +103,22 @@ exports.loginUser = async (request, response, next) => {
 
 };
 
-async function storeTokenRecordsInDocument(userProfile, accessToken) {
-
-  const accessTokens = userProfile.accessTokens;
-
-  accessTokens.push(accessToken);
-
-  const updatedUser = {
-    ...userProfile,
-    accessTokens
-  };
-
-  await User.updateUser(updatedUser);
-
-}
-
 exports.getAllUsers = async (request, response, next) => {
 
   try {
 
+    const userId = request.tokenData.userId;
+
     const users = await User.fetchAll();
 
-    return response.status(200).json({ users });
+    //removing api requesting user from the list
+    const filteredUsers = users.filter((user) => {
+      return user._id.toString() !== userId;
+    });
+
+    console.log(filteredUsers);
+
+    return response.status(200).json({ users: filteredUsers });
 
   } catch (exception) {
     return response.status(500).json({ error: exception });
@@ -170,4 +166,29 @@ exports.getMyProfile = async (request, response, next) => {
   } catch (exception) {
     return response.status(500).json({ error: exception });
   }
+};
+
+exports.deleteUser = async (request, response, next) => {
+
+  try {
+    const userId = request.body.id;
+
+    if (typeof userId === 'undefined') {
+
+      return response.status(500).json({
+        error: {
+          message: 'User id is not provided!'
+        }
+      });
+
+    }
+
+    await User.deleteById(userId);
+
+    return response.status(200).json({ message: 'User deleted successfully!' });
+
+  } catch (exception) {
+    return response.status(500).json({ error: exception });
+  }
+
 };

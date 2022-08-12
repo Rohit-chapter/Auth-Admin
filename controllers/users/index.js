@@ -3,24 +3,26 @@ const User = require('../../models/user');
 const { isValueExists } = require('../../utilities/collections');
 const { generateAccessToken } = require('../../utilities/jwt-tokens');
 
-const { storeTokenRecordsInDocument } = require('./utilities');
-
 exports.addUser = async (request, response, next) => {
 
   try {
 
     const body = request.body;
 
-    const firstName = body.firstName;
-    const lastName = body.lastName;
-    const email = body.email;
-    const password = body.password;
-    const authenticationType = body.authenticationType;
-    const user = new User(firstName, lastName, email, password, authenticationType, null, []);
+    const record = {
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      password: body.password,
+      authenticationType: body.authenticationType,
+      accessTokens: []
+    };
 
-    const users = await User.fetchAll();
+    const user = new User(record);
 
-    const userAlreadyExists = isValueExists(users, 'email', email);
+    const users = await User.find();
+
+    const userAlreadyExists = isValueExists(users, 'email', body.email);
 
     if (userAlreadyExists === true) {
 
@@ -66,7 +68,8 @@ exports.loginUser = async (request, response, next) => {
     const email = body.email;
     const password = body.password;
 
-    const user = await User.findByEmail(email);
+    const users = await User.find({ email });
+    const user = users[0];
 
     if (user === null) {
       return response.status(400).json({
@@ -103,20 +106,32 @@ exports.loginUser = async (request, response, next) => {
 
 };
 
+const storeTokenRecordsInDocument = async (userProfile, accessToken) => {
+
+  const accessTokens = userProfile.accessTokens;
+
+  accessTokens.push(accessToken);
+
+  const user = await User.findById(userProfile._id);
+
+  user.accessTokens = accessTokens;
+
+  await user.save();
+
+};
+
 exports.getAllUsers = async (request, response, next) => {
 
   try {
 
     const userId = request.tokenData.userId;
 
-    const users = await User.fetchAll();
+    const users = await User.find();
 
-    //removing api requesting user from the list
+    //removing owner from the users list
     const filteredUsers = users.filter((user) => {
       return user._id.toString() !== userId;
     });
-
-    console.log(filteredUsers);
 
     return response.status(200).json({ users: filteredUsers });
 
@@ -138,12 +153,9 @@ exports.logoutUser = async (request, response, next) => {
       return accessToken.token !== tokenData.token;
     });
 
-    const updatedUser = {
-      ...user,
-      accessTokens
-    };
+    user.accessTokens = accessTokens;
 
-    await User.updateUser(updatedUser);
+    user.save();
 
     return response.status(200).json({
       message: 'Successfully logout!'
@@ -183,7 +195,7 @@ exports.deleteUser = async (request, response, next) => {
 
     }
 
-    await User.deleteById(userId);
+    await User.findByIdAndRemove(userId);
 
     return response.status(200).json({ message: 'User deleted successfully!' });
 

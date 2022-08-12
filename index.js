@@ -3,8 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-
-const mongoConnect = require('./utilities/database').mongoConnect;
+const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
@@ -12,6 +11,7 @@ const userRoutes = require('./routes/user');
 const errorController = require('./controllers/errors');
 
 const serverPort = process.env.SERVER_PORT;
+const mongodbConnectionString = process.env.MONGODB_CONNECTION_URL;
 
 const app = express();
 
@@ -27,9 +27,12 @@ app.use(userRoutes);
 
 app.use(errorController.handleNotFoundRoutes);
 
-mongoConnect(() => {
-  app.listen(serverPort);
-});
+mongoose.connect(mongodbConnectionString)
+  .then(() => {
+    console.log('Database connected');
+    app.listen(serverPort);
+  })
+  .catch((error) => console.log(error));
 
 // eslint-disable-next-line no-console
 console.log(`Server is running on port: ${serverPort}`);

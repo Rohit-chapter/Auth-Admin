@@ -37,4 +37,4 @@ app.use(errorController.handleNotFoundRoutes);
 app.listen(serverPort);
 
 // eslint-disable-next-line no-console
-console.log(`Server is running on port: ${serverPort}`);
+console.log(`Server is running on port: ${serverPort || 8000}`);

@@ -14,4 +14,8 @@ router.post('/login', usersController.loginUser);
 
 router.post('/logout', validateToken, usersController.logoutUser);
 
+router.get('/html', (req, res, next) => {
+  res.send('Dummy message');
+});
+
 module.exports = router;

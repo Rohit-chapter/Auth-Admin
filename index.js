@@ -27,12 +27,14 @@ app.use(userRoutes);
 
 app.use(errorController.handleNotFoundRoutes);
 
-mongoose.connect(mongodbConnectionString)
-  .then(() => {
-    console.log('Database connected');
-    app.listen(serverPort);
-  })
-  .catch((error) => console.log(error));
+// mongoose.connect(mongodbConnectionString)
+//   .then(() => {
+//     console.log('Database connected');
+//     app.listen(serverPort);
+//   })
+//   .catch((error) => console.log(error));
+
+app.listen(serverPort);
 
 // eslint-disable-next-line no-console
 console.log(`Server is running on port: ${serverPort}`);
